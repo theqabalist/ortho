@@ -10,19 +10,22 @@ describe('Array parser', () => {
         Array.tryParse('[Number]')([5]).should.deep.equal({
             checks: true,
             type: '[Number]',
-            actual: '[Number]'
+            actual: '[Number]',
+            vars: {}
         });
 
         Array.tryParse('[Number]')('hello').should.deep.equal({
             checks: false,
             type: '[*]',
-            actual: 'String'
+            actual: 'String',
+            vars: {}
         });
 
         Array.tryParse('[Number]')([5, 'hello']).should.deep.equal({
             checks: false,
             type: '[Number]',
-            actual: '[1::String]'
+            actual: '[1::String]',
+            vars: {}
         });
     });
 

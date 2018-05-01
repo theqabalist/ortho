@@ -10,13 +10,15 @@ describe('Concrete parser', () => {
         Concrete.tryParse('Number')(5).should.deep.equal({
             checks: true,
             type: 'Number',
-            actual: 'Number'
+            actual: 'Number',
+            vars: {}
         });
 
         Concrete.tryParse('Number')('hello').should.deep.equal({
             checks: false,
             type: 'Number',
-            actual: 'String'
+            actual: 'String',
+            vars: {}
         });
     });
 
@@ -25,7 +27,24 @@ describe('Concrete parser', () => {
         Concrete.tryParse('MyType')(new MyType()).should.deep.equal({
             checks: true,
             type: 'MyType',
-            actual: 'MyType'
+            actual: 'MyType',
+            vars: {}
+        });
+    });
+
+    it('Protects against checking against null and undefined.', () => {
+        Concrete.tryParse('Number')(undefined).should.deep.equal({
+            checks: false,
+            type: 'Number',
+            actual: '()',
+            vars: {}
+        });
+
+        Concrete.tryParse('Number')(null).should.deep.equal({
+            checks: false,
+            type: 'Number',
+            actual: '()',
+            vars: {}
         });
     });
 });

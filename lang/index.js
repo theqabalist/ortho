@@ -5,14 +5,14 @@ const {is, curry, evolve, hasIn, isNil, all, prop, join, props, zipWith, call} =
 const mdo = require('fantasy-do');
 const {VError} = require('verror');
 
-const makeSuccess = type => ({checks: true, type, actual: type});
-const makeFailure = (type, actual) => ({checks: false, type, actual});
+const makeSuccess = type => ({checks: true, type, actual: type, vars: {}});
+const makeFailure = (type, actual) => ({checks: false, type, actual, vars: {}});
 
 const reconcileConcrete = curry((type, x) => {
-    const safe = isNil(x) ? {constructor: {name: 'Nil'}} : x;
+    const safe = isNil(x) ? {constructor: {name: '()'}} : x;
     return safe.constructor.name === type ?
         makeSuccess(type) :
-        makeFailure(type, x.constructor.name);
+        makeFailure(type, safe.constructor.name);
 });
 
 const reconcileArray = curry((reconcile, x) => {
@@ -64,9 +64,23 @@ const reconcileTuple = curry((reconcilers, t) => {
     return {checks, type: `(${expected})`, actual: `(${actual})`};
 });
 
+const reconcileUnit = curry((_, x) => isNil(x) ? makeSuccess('()') : makeFailure('()', x.constructor.name));
+
+const reconcileVar = curry((name, x) => {
+    const safe = isNil(x) ? {constructor: {name: '()'}} : x;
+    return {
+        checks: true,
+        type: safe.constructor.name,
+        actual: safe.constructor.name,
+        vars: {[name]: x}
+    };
+});
+
 module.exports = createLanguage({
+    Unit: () => string('()').map(reconcileUnit),
     Concrete: () => regex(/[A-Z][a-zA-Z]*/).map(reconcileConcrete),
     Array: ({Expression}) => Expression.wrap(string('['), string(']')).map(reconcileArray),
+    Var: () => regex(/[a-z]+/).map(reconcileVar),
     ObjectKey: () => alt(
         letter.or(digit).atLeast(1).tie(),
         letter.or(digit).atLeast(1).tie().wrap(string('"'), string('"'))
