@@ -1,0 +1,38 @@
+{
+  "name": "ortho",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=6"
+  },
+  "scripts": {
+    "test": "mocha --reporter min -w './**/*.spec.js'",
+    "test:fun": "mocha --reporter nyan './**/*.spec.js' && open coverage/lcov-report/index.html",
+    "coverage": "nyc npm run test:fun"
+  },
+  "dependencies": {
+    "daggy": "^1.2.0",
+    "fantasy-do": "^1.1.0",
+    "parsimmon": "^1.7.3",
+    "ramda": "^0.25.0",
+    "verror": "^1.10.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.1"
+  },
+  "nyc": {
+    "include": [
+      "./**/*.js"
+    ],
+    "exclude": [
+      "./**/*.spec.js"
+    ],
+    "all": true,
+    "reporter": [
+      "lcov"
+    ]
+  }
+}
